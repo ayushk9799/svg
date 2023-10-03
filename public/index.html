@@ -1,0 +1,78 @@
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Country Separation</title>
+</head>
+<body>
+    <div>hi</div>
+ <object data="newcountries.svg" type="image/svg+xml" id="worldMapObject" ></object>
+ 
+
+  <script>
+     document.addEventListener("DOMContentLoaded", function () {
+      window.addEventListener('load', function () {
+        const mapObject=document.getElementById('worldMapObject')
+    console.log(mapObject)
+    const worldMapDoc=mapObject.contentDocument;
+    console.log(worldMapDoc)
+const worldMap=worldMapDoc.getElementById("worldMap");
+console.log(worldMap)
+const paths=worldMap.querySelectorAll("path");
+console.log(paths.length)
+paths.forEach((path) => {
+  console.log(path)
+const boundingBox=path.getBBox();
+console.log(boundingBox.x)
+console.log(boundingBox.y)
+const translateX = -boundingBox.x;
+  const translateY = -boundingBox.y;
+  
+  path.setAttribute("transform", `translate(${translateX},${translateY}) `);
+  
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute('viewBox',`0 0 ${boundingBox.width} ${boundingBox.height}`)
+  svg.appendChild(path)
+   
+ 
+
+const svgData = new XMLSerializer().serializeToString(svg);
+console.log(svgData)
+const country=path.getAttribute('id');
+fetch('http://localhost:3000',{
+  method: "POST",
+     
+    // Adding body or contents to send
+    body: JSON.stringify({
+        svgData:svgData,
+        country:country,
+    }),
+     
+    // Adding headers to the request
+    headers: {
+        "Content-type": "application/json; charset=UTF-8"
+    }
+}).then((response)=>response.json()).then((data)=>console.log(data))
+
+  
+});
+
+     })
+})
+    
+      // const blob = new Blob([svgData], { type: "image/svg+xml" });
+      // const svgUrl = URL.createObjectURL(blob);
+
+      // const downloadLink = document.createElement("a");
+      // downloadLink.href = svgUrl;
+      //  downloadLink.download = `country_${10}.svg`;
+      // downloadLink.textContent = `Download Country ${1} SVG`;
+
+      // document.body.appendChild(downloadLink);
+      // downloadLink.click();
+     
+  </script>
+</body>
+</html>
